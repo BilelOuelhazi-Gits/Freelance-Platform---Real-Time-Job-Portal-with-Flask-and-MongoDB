@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat about {{ job['job_title'] }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/Zi6v09v.png');
+            background-size: cover;
+            opacity: 0.2;
+            z-index: -1;
+            animation: moveBackground 10s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            from { background-position: 0 0; }
+            to { background-position: -100px -100px; }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 80px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        h2 {
+            text-align: center;
+            background: linear-gradient(to right, #56ccf2, #2f80ed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.6s ease-in-out both;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .chat-message strong {
+            color: #56ccf2;
+        }
+
+        .chat-message small {
+            color: #ccc;
+        }
+
+        .chat-message .you {
+            color: #56ccf2;
+        }
+
+        form input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        form button {
+            padding: 12px 20px;
+            background: #56ccf2;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        form button:hover {
+            background: #2f80ed;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 30px;
+            color: #ccc;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .btn-back:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 25px;
+            }
+
+            form input[type="text"] {
+                width: 70%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-overlay"></div>
+
+    <div class="container">
+        <h2>Chat about: {{ job['job_title'] }}</h2>
+
+        <div class="chat-messages" id="chatMessages">
+            {% for msg in messages %}
+                <div class="chat-message" id="message-{{ loop.index }}">
+                    <strong>
+                        {% if msg.sender == current_user %}
+                            You:
+                        {% elif msg.sender == poster['_id']|string %}
+                            {{ poster['username'] }}:
+                        {% else %}
+                            {{ applier['username'] }}:
+                        {% endif %}
+                    </strong>
+                    {{ msg.message }}
+                    <small>({{ msg.timestamp.strftime('%Y-%m-%d %H:%M') }})</small>
+                </div>
+            {% endfor %}
+        </div>
+
+        <form method="POST">
+            <input type="text" name="message" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+        </form>
+
+<div class="text-center">
+    {% if user_role == 'poster' %}
+        <a href="{{ url_for('poster_dashboard') }}" class="btn-back">← Back to Dashboard</a>
+    {% elif user_role == 'applier' %}
+        <a href="{{ url_for('applier_dashboard') }}" class="btn-back">← Back to Dashboard</a>
+    {% endif %}
+</div>
+
+    </div>
+
+    <!-- Audio element for notification sound -->
+<audio id="newMessageSound" src="{{ url_for('static', filename='notification.mp3') }}" preload="auto"></audio>
+
+
+    <script>
+        // Function to load new messages
+        let lastMessageCount = {{ messages|length }};  // Keep track of message count
+
+        function loadMessages() {
+            const jobId = "{{ job['_id'] }}";
+            const applierId = "{{ applier['_id'] }}";
+
+            fetch(`/chat/messages/${jobId}/${applierId}`)
+                .then(response => response.json())
+                .then(messages => {
+                    const chatMessages = document.getElementById('chatMessages');
+                    chatMessages.innerHTML = ""; // Clear current messages
+
+                    messages.forEach(msg => {
+                        let sender = (msg.sender === "{{ current_user }}") ? "You" : (msg.sender === "{{ poster['_id'] }}" ? "{{ poster['username'] }}" : "{{ applier['username'] }}");
+                        let messageHTML = `
+                            <div class="chat-message">
+                                <strong>${sender}:</strong>
+                                ${msg.message}
+                                <small>(${msg.timestamp})</small>
+                            </div>
+                        `;
+                        chatMessages.innerHTML += messageHTML;
+                    });
+
+                    // Check if new messages have arrived
+                    if (messages.length > lastMessageCount) {
+                        document.getElementById('newMessageSound').play();  // Play sound if new messages exist
+                    }
+
+                    // Update last message count
+                    lastMessageCount = messages.length;
+
+                    // Scroll to the bottom of the chat
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+        }
+
+        // Load messages every 2 seconds
+        setInterval(loadMessages, 2000);
+
+        // Optionally, call loadMessages initially to start real-time updates
+        loadMessages();
+    </script>
+</body>
+</html>

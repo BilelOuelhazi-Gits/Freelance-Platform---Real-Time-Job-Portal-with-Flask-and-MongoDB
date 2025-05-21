@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Background Styling */
+        body {
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Professional moving grid background */
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/Zi6v09v.png'); /* Abstract tech lines */
+            background-size: cover;
+            opacity: 0.2;
+            animation: moveBackground 10s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            from { background-position: 0 0; }
+            to { background-position: -100px -100px; }
+        }
+
+        /* Glassmorphism Effect for Job Posting Form */
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 50%; /* Adjust this to take up the left half */
+            position: absolute;
+            top: 50%;
+            left: 0; /* Align it to the left of the screen */
+            transform: translateY(-50%); /* Center it vertically */
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+.custom-delete-btn {
+    padding: 1px 1px;  /* Smaller padding */
+    font-size: 0.7rem;  /* Smaller font size */
+    border-radius: 1px; /* Optional: makes it a little more rounded */
+    line-height: 1.2;  /* Adjust line height if needed */
+}
+        /* Job Table Styling */
+        .table-container {
+            width: 50%; /* Take the right side of the screen */
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%); /* Center vertically */
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+
+        .table {
+            color: white;
+        }
+
+        /* Heading Styling */
+        .form-container h1 {
+            font-size: 32px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        /* Flash Messages */
+        .alert {
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        /* Improved Field Styling */
+        .form-group label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #e0e0e0;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.2);  /* Subtle background for inputs */
+            border: 2px solid rgba(255, 255, 255, 0.3);  /* Light border */
+            border-radius: 10px;  /* Rounded corners */
+            color: white;
+            padding: 5px 20px;
+            font-size: 1rem;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);  /* Lighter placeholder color */
+        }
+
+        /* Focus state for inputs */
+        .form-control:focus {
+            border-color: #56ccf2;  /* Blue border on focus */
+            box-shadow: 0 0 10px rgba(86, 204, 242, 0.6);  /* Glow effect */
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .form-group input[type="date"] {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Button Styling */
+        .btn {
+            border-radius: 35px;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+        }
+
+        /* Hover effect on submit button */
+        .btn:hover {
+            background-color: #56ccf2;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Adjust spacing for better layout */
+        .form-container .row {
+            margin-bottom: 30px;
+        }
+
+        .form-container .col-md-6 {
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+
+    <div class="background-overlay"></div>
+
+
+    <div class="form-container">
+        <h1>Post a New Job</h1>
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mt-4">
+                    <ul class="alert alert-info">
+                        {% for category, message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('post_job') }}" enctype="multipart/form-data">
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="job_title">Job Title</label>
+                        <input type="text" id="job_title" name="job_title" class="form-control" required placeholder="Enter job title">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company_name">Company Name</label>
+                        <input type="text" id="company_name" name="company_name" class="form-control" required placeholder="Enter company name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="salary_range">Salary Range</label>
+                        <input type="text" id="salary_range" name="salary_range" class="form-control" required placeholder="Enter salary range">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="skills_required">Skills Required (comma-separated)</label>
+                        <input type="text" id="skills_required" name="skills_required" class="form-control" required placeholder="Enter required skills">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deadline">Application Deadline</label>
+                        <input type="date" id="deadline" name="deadline" class="form-control" required>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="job_description">Job Description</label><br>
+                        <textarea id="job_description" name="job_description" class="form-control" rows="4" required placeholder="Enter job description"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job_type">Job Type</label>
+                        <select id="job_type" name="job_type" class="form-control" required>
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Internship">Internship</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" class="form-control" required placeholder="Enter job location">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience_required">Experience Required (in years)</label>
+                        <input type="number" id="experience_required" name="experience_required" class="form-control" required placeholder="Enter experience required">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Post Job</button>
+        </form>
+
+
+    </div>
+
+
+<div class="table-container">
+    <h2>My Posted Jobs</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Job Title</th>
+                <th>Company</th>
+                <th>Deadline</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>{{ job.job_title }}</td>
+                <td>{{ job.company_name }}</td>
+                <td>{{ job.deadline }}</td>
+                <td>
+                    <a href="{{ url_for('delete_job', job_id=job._id) }}" class="btn btn-danger btn-sm custom-delete-btn">Delete</a>
+                    <!-- View Applications Form -->
+                    <form action="{{ url_for('view_applications', job_id=job._id) }}" method="get" style="display:inline;">
+                        <button type="submit" class="btn btn-info btn-sm">View Applications</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">No jobs posted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

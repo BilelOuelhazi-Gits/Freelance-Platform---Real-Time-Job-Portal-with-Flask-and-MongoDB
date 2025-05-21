@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Profile</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+
+
+        /* Style the file input labels */
+.file-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 8px; /* Adds space between the label and the input field */
+    display: block;     /* Ensure the label is on its own line */
+}
+
+/* Optional: Style the file input fields to align with the overall design */
+input[type="file"] {
+    background: rgba(255, 255, 255, 0.1); /* Keep the background consistent */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Border style */
+    border-radius: 30px;  /* Keep the rounded corners */
+    padding: 3px 20px;    /* Add padding for a thicker feel */
+    font-size: 16px;       /* Larger font for better readability */
+    color: white;          /* Text color */
+    width: 100%;           /* Ensure full-width input */
+    box-sizing: border-box; /* Include padding and border in width calculation */
+}
+
+
+/* Add Custom Styling for 'Add Another Certification' Button */
+.btn-add-certification {
+    background: #56ccf2; /* Light blue background */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: none;
+    text-transform: uppercase;
+    transition: background 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-add-certification:hover {
+    background: #2f80ed; /* Darker blue on hover */
+    transform: scale(1.05); /* Slightly enlarge the button */
+}
+
+.btn-add-certification:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 0 3px rgba(56, 132, 255, 0.5); /* Add custom focus outline */
+}
+
+
+        /* Background Styling */
+        body {
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Subtle Moving Background */
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/Zi6v09v.png');
+            background-size: cover;
+            opacity: 0.2;
+            animation: moveBackground 10s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            from { background-position: 0 0; }
+            to { background-position: -100px -100px; }
+        }
+
+        /* Glassmorphism Effect for Profile Card */
+        .profile-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 3000px;
+            width: 100%;
+            transition: transform 0.3s ease-in-out;
+            animation: fadeIn 1s ease-in-out;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Heading Styling */
+        .profile-container h1 {
+            font-size: 30px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #ffffff;
+        }
+
+        /* Cards container - using flexbox for horizontal alignment */
+        .cards-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px; /* Optional space between cards */
+        }
+
+        /* Card styling */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            color: white;
+            width: 30%; /* Adjust card width to fit horizontally */
+            min-width: 100px; /* Prevent cards from becoming too small */
+            box-sizing: border-box;
+        }
+
+        /* Heading inside card */
+        .card h3 {
+            font-size: 22px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .form-control {
+            border-radius: 30px;
+            box-shadow: none;
+            padding: 5px 20px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-group label {
+            font-size: 14px;
+            color: #ddd;
+            font-weight: bold;
+        }
+
+        /* File Upload Custom Styling */
+        .custom-file-input {
+            opacity: 0;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .custom-file-label {
+            display: block;
+            border-radius: 30px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .custom-file-label:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Submit Button Styling */
+        .btn-primary {
+            background: linear-gradient(90deg, #56ccf2, #2f80ed);
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 12px 20px;
+            border-radius: 30px;
+            transition: transform 0.2s ease-in-out;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+        }
+
+        /* Flash Messages */
+        .alert {
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .cards-container {
+                flex-direction: column; /* Stack cards vertically on smaller screens */
+                gap: 15px;
+            }
+
+            .card {
+                width: 100%; /* Make each card full width */
+            }
+
+            .profile-container {
+                padding: 30px;
+            }
+
+            .profile-container h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="background-overlay"></div>
+
+
+    <div class="profile-container">
+        <h1>Complete Your Profile</h1>
+        <form method="POST" enctype="multipart/form-data">
+
+            <div class="cards-container">
+
+                <div class="card">
+                    <h3>Personal Information</h3>
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
+                        </div>
+                    </div>
+                    <div class="form-row mt-2">
+                        <div class="col-md-6">
+                            <input type="text" name="address" class="form-control" placeholder="Address">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="url" name="linkedin" class="form-control" placeholder="LinkedIn Profile">
+                        </div>
+                    </div>
+                    <div class="form-row mt-2">
+                        <div class="col-md-6">
+                            <input type="url" name="portfolio" class="form-control" placeholder="Portfolio/Website URL">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card">
+                    <h3>Education</h3>
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <select name="education_level" class="form-control" required>
+                                <option value="High School">High School</option>
+                                <option value="Bachelor's">Bachelor's</option>
+                                <option value="Master's">Master's</option>
+                                <option value="PhD">PhD</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" name="university" class="form-control" placeholder="University/College Name" required>
+                        </div>
+                    </div>
+                    <div class="form-row mt-2">
+                        <div class="col-md-6">
+                            <input type="text" name="field_of_study" class="form-control" placeholder="Field of Study" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="number" name="graduation_year" class="form-control" placeholder="Graduation Year" required>
+                        </div>
+                    </div>
+
+                    <div id="certifications-container">
+                        <input type="text" name="certifications" class="form-control mt-2" placeholder="Certification">
+                    </div>
+                    <button type="button" onclick="addCertification()" class="btn btn-add-certification">Add Another Certification</button>
+
+                </div>
+
+
+                <div class="card">
+                    <h3>Work Experience</h3>
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <input type="text" name="company" class="form-control" placeholder="Company Name" >
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" name="job_title" class="form-control" placeholder="Job Title" >
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="form-row mt-2">
+                        <div class="col-md-6">
+                            <select name="years_experience" class="form-control">
+                                <option value="0-1">0-1 year</option>
+                                <option value="2-5">2-5 years</option>
+                                <option value="6-10">6-10 years</option>
+                                <option value="10+">10+ years</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select name="industry" class="form-control">
+                                <option value="IT">IT</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Education">Education</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                <div class="card">
+                    <h3>Job Preferences</h3>
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <select name="job_type" class="form-control">
+                                <option value="Full-time">Full-time</option>
+                                <option value="Part-time">Part-time</option>
+                                <option value="Internship">Internship</option>
+                                <option value="Remote">Remote</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" name="salary_range" class="form-control" placeholder="Wage Per Hour">
+                        </div>
+                    </div>
+                    <div class="form-row mt-2">
+                        <div class="col-md-6">
+                            <input type="text" name="work_location" class="form-control" placeholder="Preferred Work Location">
+                        </div>
+                        <div class="col-md-6">
+                            <select name="availability" class="form-control">
+                                <option value="Immediately Available">Immediately Available</option>
+                                <option value="Notice Period">Notice Period</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card">
+                    <h3>Uploads</h3>
+
+<div class="form-group">
+    <label for="profile_picture" class="file-label">Upload Profile Picture</label>
+    <input type="file" name="profile_picture" id="profile_picture" class="form-control mb-2">
+</div>
+
+
+<div class="form-group">
+    <label for="cv" class="file-label">Upload CV</label>
+    <input type="file" name="cv" id="cv" class="form-control mb-2" required>
+</div>
+
+
+<div class="form-group">
+    <label for="cover_letter" class="file-label">Upload Cover Letter</label>
+    <input type="file" name="cover_letter" id="cover_letter" class="form-control">
+</div>
+
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mt-4">
+                    <ul class="alert alert-info">
+                        {% for category, message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function addCertification() {
+            var container = document.getElementById("certifications-container");
+            var input = document.createElement("input");
+            input.type = "text";
+            input.name = "certifications";
+            input.classList.add("form-control", "mt-2");
+            input.placeholder = "Certification";
+            container.appendChild(input);
+        }
+
+        document.getElementById("skills-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                var skill = this.value.trim();
+                if (skill) {
+                    var container = document.getElementById("skills-container");
+                    var span = document.createElement("span");
+                    span.textContent = skill;
+                    span.classList.add("badge", "badge-primary", "m-1");
+                    container.appendChild(span);
+                    this.value = "";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
